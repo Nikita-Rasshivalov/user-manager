@@ -30,8 +30,8 @@ export class UserRepository {
       row.email,
       row.password,
       row.status,
-      row.last_login,
       row.created_at,
+      row.last_login,
       row.id
     );
   }
@@ -50,8 +50,8 @@ export class UserRepository {
       row.email,
       row.password,
       row.status,
-      row.last_login,
       row.created_at,
+      row.last_login,
       row.id
     );
   }
@@ -87,8 +87,8 @@ export class UserRepository {
           row.email,
           row.password,
           row.status,
-          row.last_login,
           row.created_at,
+          row.last_login,
           row.id
         )
     );
@@ -101,5 +101,12 @@ export class UserRepository {
 
   async deleteUser(id: number): Promise<void> {
     await this.updateStatus(id, UserStatus.DELETED);
+  }
+
+  async updateStatusBulk(ids: number[], status: UserStatus): Promise<void> {
+    if (ids.length === 0) return;
+    const placeholders = ids.map(() => "?").join(",");
+    const sql = `UPDATE users SET status = ? WHERE id IN (${placeholders})`;
+    await this.pool.execute(sql, [status, ...ids]);
   }
 }

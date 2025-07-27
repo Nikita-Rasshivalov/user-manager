@@ -1,39 +1,39 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/AuthService";
+import { BaseController } from "./BaseController";
 
 const authService = new AuthService();
 
-export class AuthController {
-  static async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
-    }
+export class AuthController extends BaseController {
+  async login(req: Request, res: Response) {
+    await this.handle(res, async () => {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        throw new Error("Email and password required");
+      }
 
-    const token = await authService.login(email, password);
-    if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials or blocked user" });
-    }
+      const token = await authService.login(email, password);
+      if (!token) {
+        throw new Error("Invalid credentials or blocked user");
+      }
 
-    return res.json({ token });
+      return { token };
+    });
   }
 
-  static async register(req: Request, res: Response) {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields required" });
-    }
+  async register(req: Request, res: Response) {
+    await this.handle(
+      res,
+      async () => {
+        const { name, email, password } = req.body;
+        if (!name || !email || !password) {
+          throw new Error("All fields required");
+        }
 
-    try {
-      const user = await authService.register(name, email, password);
-      return res.status(201).json({ id: user?.id });
-    } catch (error: any) {
-      if (error.code === "ER_DUP_ENTRY") {
-        return res.status(409).json({ message: "Email already exists" });
-      }
-      return res.status(500).json({ message: "Internal server error" });
-    }
+        const user = await authService.register(name, email, password);
+        return { id: user?.id };
+      },
+      201
+    );
   }
 }

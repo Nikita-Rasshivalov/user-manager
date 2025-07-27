@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtService } from "../services/JwtService";
 import { UserRepository } from "../repositories/UserRepository";
+import { User, UserStatus } from "../models/User";
+
+export interface AuthRequest extends Request {
+  user?: User;
+}
 
 export async function authMiddleware(
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) {
@@ -21,13 +26,15 @@ export async function authMiddleware(
 
   const userRepo = new UserRepository();
   const user = await userRepo.findById(payload.userId);
-  if (!user || user.status === 1 || user.status === 2) {
+  if (
+    !user ||
+    user.status === UserStatus.BLOCKED ||
+    user.status === UserStatus.DELETED
+  ) {
     return res
       .status(401)
       .json({ message: "Unauthorized: User blocked or deleted" });
   }
-
-  (req as any).user = user;
-
+  req.user = user;
   next();
 }

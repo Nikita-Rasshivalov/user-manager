@@ -11,10 +11,10 @@ export class UserService {
 
   async register(dto: UserRegisterDTO): Promise<UserResponseDTO> {
     if (!isNonEmptyString(dto.name))
-      throw new Error("Name must be non-empty string");
-    if (!isValidEmail(dto.email)) throw new Error("Invalid email");
-    if (!isNonEmptyString(dto.password))
-      throw new Error("Password must be non-empty string");
+      throw new Error("Name must be a non-empty string");
+    if (!isValidEmail(dto.email)) throw new Error("Invalid email format");
+    if (!isNonEmptyString(dto.password) || dto.password.length < 6)
+      throw new Error("Password must be at least 6 characters long");
 
     const hashed = await hashPassword(dto.password);
 
@@ -26,18 +26,17 @@ export class UserService {
   }
 
   async login(dto: UserLoginDTO): Promise<UserResponseDTO> {
-    if (!isValidEmail(dto.email)) throw new Error("Invalid email");
+    if (!isValidEmail(dto.email)) throw new Error("Invalid email format");
     if (!isNonEmptyString(dto.password))
-      throw new Error("Password must be non-empty string");
+      throw new Error("Password must be a non-empty string");
 
     const user = await this.userRepo.findByEmail(dto.email);
     if (!user) throw new Error("Invalid email or password");
-    if (user.status === UserStatus.BLOCKED) throw new Error("User blocked");
+    if (user.status === UserStatus.BLOCKED) throw new Error("User is blocked");
 
-    const match = await comparePasswords(dto.password, user.password);
-    if (!match) throw new Error("Invalid email or password");
+    const isMatch = await comparePasswords(dto.password, user.password);
+    if (!isMatch) throw new Error("Invalid email or password");
 
-    // Обновляем last_login
     user.last_login = new Date();
     await this.userRepo.update(user);
 
@@ -50,21 +49,15 @@ export class UserService {
   }
 
   async blockUsers(ids: number[]): Promise<void> {
-    for (const id of ids) {
-      await this.userRepo.updateStatus(id, UserStatus.BLOCKED);
-    }
+    await this.userRepo.updateStatusBulk(ids, UserStatus.BLOCKED);
   }
 
   async unblockUsers(ids: number[]): Promise<void> {
-    for (const id of ids) {
-      await this.userRepo.updateStatus(id, UserStatus.ACTIVE);
-    }
+    await this.userRepo.updateStatusBulk(ids, UserStatus.ACTIVE);
   }
 
   async deleteUsers(ids: number[]): Promise<void> {
-    for (const id of ids) {
-      await this.userRepo.deleteUser(id);
-    }
+    await this.userRepo.updateStatusBulk(ids, UserStatus.DELETED);
   }
 
   private toUserResponseDTO(user: User): UserResponseDTO {

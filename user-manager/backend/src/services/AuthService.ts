@@ -2,6 +2,7 @@ import { JwtService } from "./JwtService";
 import { UserRepository } from "../repositories/UserRepository";
 import { UserStatus } from "../models/User";
 import { User } from "../models/User";
+import { hashPassword, comparePasswords } from "../utils/hash";
 
 export class AuthService {
   private jwtService = JwtService.getInstance();
@@ -11,7 +12,8 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(email);
     if (!user) return null;
 
-    if (user.password !== password) return null;
+    const match = await comparePasswords(password, user.password);
+    if (!match) return null;
 
     if (
       user.status === UserStatus.BLOCKED ||
@@ -37,7 +39,8 @@ export class AuthService {
     email: string,
     password: string
   ): Promise<User | null> {
-    const user = new User(name, email, password, UserStatus.ACTIVE);
+    const hashedPassword = await hashPassword(password);
+    const user = new User(name, email, hashedPassword, UserStatus.ACTIVE);
     return await this.userRepository.create(user);
   }
 }

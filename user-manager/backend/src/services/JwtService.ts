@@ -1,9 +1,10 @@
 import jwt, { SignOptions } from "jsonwebtoken";
+import { UserStatus } from "../models/User";
 
 export interface JwtPayload {
   userId: number;
   email: string;
-  status: number;
+  status: UserStatus;
 }
 
 export class JwtService {
