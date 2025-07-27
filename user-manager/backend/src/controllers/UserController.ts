@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
 import { BaseController } from "./BaseController";
+import { AuthRequest } from "../Requests/AuthRequest";
 
 const userService = new UserService();
 
@@ -17,15 +18,17 @@ export class UserController extends BaseController {
     await this.handle(res, () => userService.getAllUsers(), 200);
   }
 
-  async blockUsers(req: Request, res: Response) {
+  async blockUsers(req: AuthRequest, res: Response) {
     await this.handle(res, async () => {
       const ids: number[] = req.body.ids;
       await userService.blockUsers(ids);
-      return { message: "Users blocked successfully" };
+
+      const selfBlocked = req.user && ids.includes(req.user.id!);
+      return { message: "Users blocked successfully", selfBlocked };
     });
   }
 
-  async unblockUsers(req: Request, res: Response) {
+  async unblockUsers(req: AuthRequest, res: Response) {
     await this.handle(res, async () => {
       const ids: number[] = req.body.ids;
       await userService.unblockUsers(ids);
@@ -33,7 +36,7 @@ export class UserController extends BaseController {
     });
   }
 
-  async deleteUsers(req: Request, res: Response) {
+  async deleteUsers(req: AuthRequest, res: Response) {
     await this.handle(res, async () => {
       const ids: number[] = req.body.ids;
       await userService.deleteUsers(ids);

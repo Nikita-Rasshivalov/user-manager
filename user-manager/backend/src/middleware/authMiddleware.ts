@@ -1,11 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { JwtService } from "../services/JwtService";
 import { UserRepository } from "../repositories/UserRepository";
-import { User, UserStatus } from "../models/User";
-
-export interface AuthRequest extends Request {
-  user?: User;
-}
+import { UserStatus } from "../models/User";
+import { AuthRequest } from "../Requests/AuthRequest";
 
 export async function authMiddleware(
   req: AuthRequest,
