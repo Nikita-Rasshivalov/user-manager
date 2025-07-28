@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sendErrorResponse } from "../utils/errorHandler";
+import { sendErrorResponse } from "../utils/errorHandler.ts";
 
 export abstract class BaseController {
   protected async handle(

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/UserService";
-import { BaseController } from "./BaseController";
-import { AuthRequest } from "../Requests/AuthRequest";
+import { UserService } from "../services/UserService.ts";
+import { BaseController } from "./BaseController.ts";
+import { AuthRequest } from "../Requests/AuthRequest.ts";
 
 const userService = new UserService();
 

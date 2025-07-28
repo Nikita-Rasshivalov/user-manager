@@ -1,5 +1,5 @@
-import { database } from "../db";
-import { User, UserStatus } from "../models/User";
+import { database } from "../db.ts";
+import { User, UserStatus } from "../models/User.ts";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 interface UserRow extends RowDataPacket {

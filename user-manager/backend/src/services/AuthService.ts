@@ -1,8 +1,8 @@
-import { JwtService } from "./JwtService";
-import { UserRepository } from "../repositories/UserRepository";
-import { UserStatus } from "../models/User";
-import { User } from "../models/User";
-import { hashPassword, comparePasswords } from "../utils/hash";
+import { JwtService } from "./JwtService.ts";
+import { UserRepository } from "../repositories/UserRepository.ts";
+import { UserStatus } from "../models/User.ts";
+import { User } from "../models/User.ts";
+import { hashPassword, comparePasswords } from "../utils/hash.ts";
 
 export class AuthService {
   private jwtService = JwtService.getInstance();

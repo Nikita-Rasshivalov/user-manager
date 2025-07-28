@@ -1,10 +1,10 @@
-import { UserRepository } from "../repositories/UserRepository";
-import { UserRegisterDTO } from "../dtos/UserRegisterDTO";
-import { UserLoginDTO } from "../dtos/UserLoginDTO";
-import { UserResponseDTO } from "../dtos/UserResponseDTO";
-import { User, UserStatus } from "../models/User";
-import { hashPassword, comparePasswords } from "../utils/hash";
-import { isNonEmptyString, isValidEmail } from "../utils/validation";
+import { UserRepository } from "../repositories/UserRepository.ts";
+import { UserRegisterDTO } from "../dtos/UserRegisterDTO.ts";
+import { UserLoginDTO } from "../dtos/UserLoginDTO.ts";
+import { UserResponseDTO } from "../dtos/UserResponseDTO.ts";
+import { User, UserStatus } from "../models/User.ts";
+import { hashPassword, comparePasswords } from "../utils/hash.ts";
+import { isNonEmptyString, isValidEmail } from "../utils/validation.ts";
 
 export class UserService {
   private userRepo = new UserRepository();

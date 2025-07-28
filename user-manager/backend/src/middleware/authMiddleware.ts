@@ -1,8 +1,8 @@
 import { Response, NextFunction } from "express";
-import { JwtService } from "../services/JwtService";
-import { UserRepository } from "../repositories/UserRepository";
-import { UserStatus } from "../models/User";
-import { AuthRequest } from "../Requests/AuthRequest";
+import { JwtService } from "../services/JwtService.ts";
+import { UserRepository } from "../repositories/UserRepository.ts";
+import { UserStatus } from "../models/User.ts";
+import { AuthRequest } from "../Requests/AuthRequest.ts";
 
 export async function authMiddleware(
   req: AuthRequest,

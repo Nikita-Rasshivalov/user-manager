@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AuthService } from "../services/AuthService";
-import { BaseController } from "./BaseController";
+import { AuthService } from "../services/AuthService.ts";
+import { BaseController } from "./BaseController.ts";
 
 const authService = new AuthService();
 

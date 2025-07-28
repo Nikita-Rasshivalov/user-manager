@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from "jsonwebtoken";
-import { UserStatus } from "../models/User";
+import { UserStatus } from "../models/User.ts";
 
 export interface JwtPayload {
   userId: number;
