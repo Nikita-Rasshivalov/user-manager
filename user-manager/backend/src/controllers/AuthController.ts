@@ -27,6 +27,7 @@ export class AuthController extends BaseController {
   };
 
   register = async (req: Request, res: Response) => {
+    console.log("Login request body:", req.body);
     await this.handle(
       res,
       async () => {
@@ -47,5 +48,29 @@ export class AuthController extends BaseController {
       },
       201
     );
+  };
+
+  me = async (req: Request, res: Response) => {
+    await this.handle(res, async () => {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new Error("Authorization header missing or invalid");
+      }
+      const token = authHeader.split(" ")[1];
+
+      const payload = authService.getJwtPayload(token);
+      if (!payload || !payload.userId) {
+        throw new Error("Invalid token");
+      }
+
+      const user = await authService.getUserById(payload.userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      return {
+        user,
+      };
+    });
   };
 }

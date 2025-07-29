@@ -96,10 +96,9 @@ export class UserRepository {
   }
 
   async getAllUsersSorted(): Promise<User[]> {
-    const sql = `SELECT * FROM users WHERE status != ? ORDER BY last_login DESC`;
-    const [rows] = await this.pool.execute<UserRow[]>(sql, [
-      UserStatus.DELETED,
-    ]);
+    const sql = `SELECT * FROM users ORDER BY last_login DESC`;
+    const [rows] = await this.pool.execute<UserRow[]>(sql);
+
     return rows.map(
       (row) =>
         new User(

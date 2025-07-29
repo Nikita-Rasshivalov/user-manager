@@ -11,6 +11,7 @@ export abstract class BaseController {
       const result = await fn();
       res.status(statusCode).json(result);
     } catch (error) {
+      console.error("Error caught in BaseController:", error);
       sendErrorResponse(res, error, 500);
     }
   }

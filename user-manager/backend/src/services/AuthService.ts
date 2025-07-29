@@ -78,4 +78,18 @@ export class AuthService {
       last_login: user.last_login ?? null,
     };
   }
+
+  public getJwtPayload(token: string): any | null {
+    try {
+      return this.jwtService.verify(token);
+    } catch {
+      return null;
+    }
+  }
+
+  public async getUserById(id: number) {
+    const user = await this.userRepository.findById(id);
+    if (!user) return null;
+    return this.toUserResponseDTO(user);
+  }
 }
