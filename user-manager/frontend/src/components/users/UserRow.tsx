@@ -8,6 +8,25 @@ interface UserRowProps {
   onCheck: (id: number) => void;
 }
 
+const formatLastSeen = (lastLogin: string | null): string => {
+  if (!lastLogin) return "–";
+
+  const lastDate = new Date(lastLogin);
+  const now = new Date();
+  const diffMs = now.getTime() - lastDate.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+
+  if (diffMinutes < 1) return "less than a minute ago";
+  if (diffMinutes < 5) return "less than 5 minutes ago";
+  if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours} hours ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} days ago`;
+};
+
 const UserRow: React.FC<UserRowProps> = ({ user, checked, onCheck }) => {
   const isDeleted = user.status === UserStatus.DELETED;
 
@@ -44,7 +63,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, checked, onCheck }) => {
           isDeleted ? "line-through text-gray-400" : ""
         }`}
       >
-        {user.last_login ? new Date(user.last_login).toLocaleString() : "–"}
+        {formatLastSeen(user.last_login)}
       </td>
       <td className="p-2 border border-gray-300">
         {user.status === UserStatus.ACTIVE

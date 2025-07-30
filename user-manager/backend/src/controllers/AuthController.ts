@@ -13,21 +13,15 @@ export class AuthController extends BaseController {
         email: req.body.email,
         password: req.body.password,
       };
-
       const result = await authService.login(dto);
-      if (!result) {
-        throw new Error("Invalid credentials or blocked/deleted user");
-      }
-
       return {
-        token: result.token,
-        user: result.user,
+        token: result?.token,
+        user: result?.user,
       };
     });
   };
 
   register = async (req: Request, res: Response) => {
-    console.log("Login request body:", req.body);
     await this.handle(
       res,
       async () => {

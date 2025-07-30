@@ -14,23 +14,11 @@ export class AuthService {
 
   public async login(
     dto: UserLoginDTO
-  ): Promise<{ token: string; user: UserResponseDTO } | null> {
-    if (!isValidEmail(dto.email)) throw new Error("Invalid email format");
-    if (!isNonEmptyString(dto.password))
-      throw new Error("Password is required");
+  ): Promise<{ token: string; user: UserResponseDTO }> {
+    this.validateLoginDto(dto);
 
-    const user = await this.userRepository.findByEmail(dto.email);
-    if (!user) return null;
-
-    const match = await comparePasswords(dto.password, user.password);
-    if (!match) return null;
-
-    if (
-      user.status === UserStatus.BLOCKED ||
-      user.status === UserStatus.DELETED
-    ) {
-      return null;
-    }
+    const user = await this.findUserByEmail(dto.email);
+    await this.validateUserCredentials(user, dto.password);
 
     user.last_login = new Date();
     await this.userRepository.update(user);
@@ -47,14 +35,54 @@ export class AuthService {
     };
   }
 
-  public async register(dto: UserRegisterDTO): Promise<UserResponseDTO> {
+  private validateLoginDto(dto: UserLoginDTO) {
+    if (!isValidEmail(dto.email)) throw new Error("Invalid email format");
+    if (!isNonEmptyString(dto.password))
+      throw new Error("Password is required");
+  }
+
+  private async findUserByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) throw new Error("Invalid credentials");
+    return user;
+  }
+
+  private async validateUserCredentials(
+    user: User,
+    password: string
+  ): Promise<void> {
+    const match = await comparePasswords(password, user.password);
+    if (!match) throw new Error("Invalid credentials");
+
+    if (
+      user.status === UserStatus.BLOCKED ||
+      user.status === UserStatus.DELETED
+    ) {
+      throw new Error("User is blocked or deleted");
+    }
+  }
+
+  private validateRegisterData(dto: UserRegisterDTO): void {
     if (!isNonEmptyString(dto.name))
       throw new Error("Name must be a non-empty string");
     if (!isValidEmail(dto.email)) throw new Error("Invalid email format");
-    if (!isNonEmptyString(dto.password) || dto.password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
+    if (!isNonEmptyString(dto.password)) {
+      throw new Error("Password is required");
     }
+  }
 
+  private async restoreDeletedUser(
+    existingUser: User,
+    dto: UserRegisterDTO
+  ): Promise<UserResponseDTO> {
+    existingUser.name = dto.name;
+    existingUser.password = await hashPassword(dto.password);
+    existingUser.status = UserStatus.ACTIVE;
+    await this.userRepository.update(existingUser);
+    return this.toUserResponseDTO(existingUser);
+  }
+
+  private async createNewUser(dto: UserRegisterDTO): Promise<UserResponseDTO> {
     const hashedPassword = await hashPassword(dto.password);
     const user = new User(
       dto.name,
@@ -64,8 +92,24 @@ export class AuthService {
     );
     const created = await this.userRepository.create(user);
     if (!created) throw new Error("User creation failed");
-
     return this.toUserResponseDTO(created);
+  }
+
+  public async register(dto: UserRegisterDTO): Promise<UserResponseDTO> {
+    this.validateRegisterData(dto);
+
+    const existingUser = await this.userRepository.findByEmailIncludeDeleted(
+      dto.email
+    );
+
+    if (existingUser) {
+      if (existingUser.status !== UserStatus.DELETED) {
+        throw new Error("Email already registered");
+      }
+      return this.restoreDeletedUser(existingUser, dto);
+    }
+
+    return this.createNewUser(dto);
   }
 
   private toUserResponseDTO(user: User): UserResponseDTO {

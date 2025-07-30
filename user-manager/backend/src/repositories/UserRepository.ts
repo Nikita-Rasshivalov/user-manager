@@ -54,6 +54,23 @@ export class UserRepository {
     );
   }
 
+  async findByEmailIncludeDeleted(email: string): Promise<User | null> {
+    const sql = `SELECT * FROM users WHERE email = ?`;
+    const [rows] = await this.pool.execute<UserRow[]>(sql, [email]);
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    return new User(
+      row.name,
+      row.email,
+      row.password,
+      row.status,
+      row.created_at,
+      row.last_login,
+      row.id
+    );
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const sql = `SELECT * FROM users WHERE email = ? AND status != ?`;
     const [rows] = await this.pool.execute<UserRow[]>(sql, [

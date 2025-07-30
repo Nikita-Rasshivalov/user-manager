@@ -23,7 +23,20 @@ const Toolbar: React.FC<ToolbarProps> = ({
         onClick={onBlock}
         className="bg-red-600 hover:bg-red-700 disabled:bg-red-300"
       >
-        Block
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5 inline-block"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 15v2m-4-6v-2a4 4 0 118 0v2m-8 0h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4a2 2 0 012-2z"
+          />
+        </svg>
       </Button>
       <Button
         disabled={disabled}
@@ -32,18 +45,18 @@ const Toolbar: React.FC<ToolbarProps> = ({
         aria-label="Unblock"
       >
         <svg
+          xmlns="http://www.w3.org/2000/svg"
           className="w-5 h-5 inline-block"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          stroke="currentColor"
+          strokeWidth={2}
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
+            d="M15 11V7a3 3 0 10-6 0m10 4H5a2 2 0 00-2 2v5a2 2 0 002 2h14a2 2 0 002-2v-5a2 2 0 00-2-2z"
+          />
         </svg>
       </Button>
       <Button
