@@ -8,22 +8,22 @@ export default defineConfig({
     outDir: "build",
   },
   server: {
-    port: 3100,
+    port: 3000,
     proxy: {
       "/auth": {
-        target: "http://localhost:3000",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false,
       },
       "/users": {
-        target: "http://localhost:3000",
+        target: "http://localhost:3001",
         changeOrigin: true,
         secure: false,
       },
     },
   },
   preview: {
-    port: 3100,
+    port: 3000,
     host: true,
   },
 });
